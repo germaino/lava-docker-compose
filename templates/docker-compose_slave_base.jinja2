@@ -1,0 +1,14 @@
+  dispatcher:
+    image: lavasoftware/amd64-lava-dispatcher:2019.01
+    container_name: lava_dispatcher
+    devices:
+      - /dev/net/tun # needed for QEMU
+    cap_add:
+      - NET_ADMIN # needed for QEMU
+    environment:
+      - "DISPATCHER_HOSTNAME=--hostname={{ DISPATCHER_HOSTNAME }}"
+      - "LOGGER_URL=tcp://{{ LAVA_SERVER_HOSTNAME }}:{{ LAVA_SERVER_LOGS_PORT }}" # url to send logs
+      - "MASTER_URL=tcp://{{ LAVA_SERVER_HOSTNAME }}:{{ LAVA_SERVER_MASTER_PORT }}" # url of lava master
+    volumes:
+      - '/boot:/boot:ro'
+      - '/lib/modules:/lib/modules:ro'

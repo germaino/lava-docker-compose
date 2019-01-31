@@ -1,0 +1,46 @@
+
+masters:
+  - name: server
+    host: zebulon
+    dns_name: my.server.com
+    zmq_auth: True
+    logger_port: 5555
+    master_port: 5556
+    server_port: 10080
+    postgre_user: lavaserver
+    postgre_hostname: database
+    postgre_password: mysecretpassword
+    zmq_auth_key: zmqauth/certs/master1/master1.key
+    zmq_auth_key_secret: zmqauth/certs/master1/master1.key_secret
+    users:
+    - name: admin
+      password: admin
+      superuser: yes
+      staff: yes
+
+slaves:
+  - name: slave-0
+    host: zebulon
+    zmq_auth_key: zmqauth/certs/slave0/lab-slave-0.key
+    zmq_auth_key_secret: zmqauth/certs/slave0/lab-slave-0.key_secret
+    remote_master: master1
+  - name: slave-1
+    host: zak-ThinkStation-P300
+    zmq_auth_key: zmqauth/certs/slave1/lab-slave-1.key
+    zmq_auth_key_secret: zmqauth/certs/slave1/lab-slave-1.key_secret
+    remote_master: server
+
+boards:
+  - name: qemu-01
+    type: qemu
+    slave: slave-0
+    options:
+    - "set mac_addr = 'DE:AD:BE:EF:66:01'"
+    - "set memory = 1024"
+    - "set netdevice = 'tap'"
+  - name: ssh-lces-01
+    type: ssh
+    slave: slave-1
+    options:
+    - "set ssh_host = '10.216.76.99'"
+    - "set os = 'oe'"
