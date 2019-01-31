@@ -1,7 +1,7 @@
 
 masters:
   - name: server
-    host: zebulon
+    host: localhost
     dns_name: my.server.com
     zmq_auth: True
     logger_port: 5555
@@ -20,14 +20,9 @@ masters:
 
 slaves:
   - name: slave-0
-    host: zebulon
+    host: localhost
     zmq_auth_key: zmqauth/certs/slave0/lab-slave-0.key
     zmq_auth_key_secret: zmqauth/certs/slave0/lab-slave-0.key_secret
-    remote_master: master1
-  - name: slave-1
-    host: zak-ThinkStation-P300
-    zmq_auth_key: zmqauth/certs/slave1/lab-slave-1.key
-    zmq_auth_key_secret: zmqauth/certs/slave1/lab-slave-1.key_secret
     remote_master: server
 
 boards:
@@ -38,9 +33,3 @@ boards:
     - "set mac_addr = 'DE:AD:BE:EF:66:01'"
     - "set memory = 1024"
     - "set netdevice = 'tap'"
-  - name: ssh-lces-01
-    type: ssh
-    slave: slave-1
-    options:
-    - "set ssh_host = '10.216.76.99'"
-    - "set os = 'oe'"
