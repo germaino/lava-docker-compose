@@ -2,12 +2,12 @@
 
 if [ ! -d .venv ] ; then
   virtualenv --python=$(which python2) .venv
+  source .venv/bin/activate
+  pip install -r requirements.txt
+else
+  source .venv/bin/activate
 fi
 
-source .venv/bin/activate
-if [ ! -d .venv ] ; then
-  pip install pyyaml Jinja2 pathlib ruamel.yaml
-fi
 
 rm -rf output
 python lavasetup-gen.py -v 3 $@
