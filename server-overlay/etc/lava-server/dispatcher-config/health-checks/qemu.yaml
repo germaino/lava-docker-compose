@@ -26,7 +26,8 @@ actions:
     images:
         rootfs:
           image_arg: -drive format=raw,file={rootfs}
-          url: http://images.validation.linaro.org/kvm/standard/large-stable-6.img.gz
+          url: http://images.validation.linaro.org/snapshots.linaro.org/components/lava/standard/debian/stretch/amd64/2/stretch.img.gz
+          sha256sum: b5cdb3b9e65fec2d3654a05dcdf507281f408b624535b33375170d1e852b982c
           compression: gz
     os: debian
     root_partition: 1

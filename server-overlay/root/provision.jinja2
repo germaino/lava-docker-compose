@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Idempotentally provision users and devices in lava
+
+set -ex
+
+{% for USER in USERS %}
+  {%- set superuser = "" %}
+  {%- set staff = "" %}
+
+  {%- if USER['superuser'] == True %}
+    {%- set superuser = "--superuser" %}
+  {%- endif -%}
+
+  {%- if USER['staff'] == True %}
+    {%- set staff = "--staff" %}
+  {%- endif -%}
+lava-server manage users list | grep -q {{ USER['name'] }} || \
+      lava-server manage users add {{ staff }} {{ superuser }} --passwd {{ USER['password'] }} {{ USER['name'] }}
+{% endfor %}
+
+{% for BOARD in BOARDS %}
+
+lava-server manage device-types list | grep -q {{ BOARD['type'] }} || \
+    lava-server manage device-types add {{ BOARD['type'] }}
+
+lava-server manage devices list | grep -q {{ BOARD['name'] }} || \
+    lava-server manage devices add --device-type {{ BOARD['type'] }} --worker {{ BOARD['slave'] }} {{ BOARD['name'] }}
+{% endfor %}
+

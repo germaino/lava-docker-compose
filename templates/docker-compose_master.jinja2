@@ -1,0 +1,50 @@
+version: '3.4'
+services:
+
+  {{ LAVA_SERVER_DB_HOSTNAME }}:
+    image: postgres:9.6
+    container_name: lava_postgres
+    environment:
+      POSTGRES_USER: {{ POSTGRES_USER }}
+      POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD }}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  {{ LAVA_SERVER_HOSTNAME }}:
+    #image: lavasoftware/amd64-lava-server:2019.01
+    # Use an updated entrypoint; this is necessary to run provision.sh at boot time
+    # See https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10
+    build:
+      context: ./server-docker
+
+    container_name: lava_server
+    ports:
+      - {{ LAVA_SERVER_HOST_PORT }}:80
+      - {{ LAVA_SERVER_LOGS_PORT }}:{{ LAVA_SERVER_LOGS_PORT }}
+      - {{ LAVA_SERVER_MASTER_PORT }}:{{ LAVA_SERVER_MASTER_PORT }}
+    volumes:
+      # Job artifact storage
+      - {{ LAVA_SERVER_OVERLAY_PATH }}/joboutput:/var/lib/lava-server/default/media/job-output
+
+      # server configuration files and directories
+      - {{ LAVA_SERVER_OVERLAY_PATH }}/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
+      - {{ LAVA_SERVER_OVERLAY_PATH }}/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
+      - {{ LAVA_SERVER_OVERLAY_PATH }}/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
+      - {{ LAVA_SERVER_OVERLAY_PATH }}/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
+
+      # provisioning script to add users and boards
+      - {{ LAVA_SERVER_OVERLAY_PATH }}/root/provision.sh:/root/provision.sh
+
+    depends_on:
+      - database
+
+{#- include slave if defined variable defined #}
+{% if HAVE_SLAVE is defined and HAVE_SLAVE == "true" %}
+{% include 'docker-compose_slave_base.jinja2' %}
+{% endif %}
+
+
+volumes:
+  # postgres data volume
+  pgdata:
+    name: lava-server-pgdata
