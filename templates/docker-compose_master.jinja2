@@ -24,7 +24,7 @@ services:
       - {{ LAVA_SERVER_MASTER_PORT }}:{{ LAVA_SERVER_MASTER_PORT }}
     volumes:
       # Job artifact storage
-      - {{ LAVA_SERVER_OVERLAY_PATH }}/joboutput:/var/lib/lava-server/default/media/job-output
+      - joboutput:/var/lib/lava-server/default/media/job-output
 
       # server configuration files and directories
       - {{ LAVA_SERVER_OVERLAY_PATH }}/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
@@ -48,3 +48,7 @@ volumes:
   # postgres data volume
   pgdata:
     name: lava-server-pgdata
+
+  # lava-server job artifact volume
+  joboutput:
+    name: lava-server-job-output
