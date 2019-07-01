@@ -23,6 +23,11 @@ slaves:
     host: localhost
     zmq_auth_key: zmqauth/certs/slave0/lab-slave-0.key
     zmq_auth_key_secret: zmqauth/certs/slave0/lab-slave-0.key_secret
+    remote_master: master1
+  - name: slave-1
+    host: my-slave
+    zmq_auth_key: zmqauth/certs/slave1/lab-slave-1.key
+    zmq_auth_key_secret: zmqauth/certs/slave1/lab-slave-1.key_secret
     remote_master: server
 
 boards:
@@ -34,4 +39,10 @@ boards:
     - "set memory = 1024"
     - "set netdevice = 'tap'"
     - "set no_kvm = 1"
+- name: rsp
+    type: ssh
+    slave: slave-1
+    options:
+    - "set ssh_host = '10.216.76.99'"
+    - "set os = 'oe'"
 

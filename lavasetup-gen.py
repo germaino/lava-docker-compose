@@ -223,6 +223,15 @@ def copy_master_dockerfile(host):
     shutil.copy(str(templates)+"/entrypoint.sh", conf_file_path)
 
 
+def copy_squid_configuration(host):
+
+    logger.info("Copy Squid configuration")
+
+    base_dir = pathlib.Path(__name__).parent
+    conf_file_path = str(base_dir)+"/output/%s/squid" %(host)
+
+    templates = base_dir / "squid"
+    shutil.copy(str(templates)+"/squid.conf", conf_file_path)
 
 
 def process_lava_server_master(workers, args):
@@ -250,7 +259,8 @@ def process_lava_server_master(workers, args):
 
     path_list = [ "output/%s/server-overlay/etc/lava-server/dispatcher-config/devices" %host,
             "output/%s/server-overlay/etc/lava-server/dispatcher-config/health-checks" %host,
-            "output/%s/server-overlay/root" %host,
+            "output/%s/server-overlay/root/entrypoint.d" %host,
+            "output/%s/squid" %host,
             "output/%s/server-docker" %host ]
 
     for path in path_list:
@@ -270,13 +280,19 @@ def process_lava_server_master(workers, args):
     "LAVA_SERVER_OVERLAY_PATH": "./server-overlay"
     }
 
-    # Copy Dockerfile for master
-    copy_master_dockerfile(host)
+    # Copy Squid configuration
+    copy_squid_configuration(host)
 
 
     # Copy master instance.conf
     base_dir = pathlib.Path(__name__).parent
     conf_file_path = str(base_dir)+"/output/%s/server-overlay/etc/lava-server" %(host)
+    templates = base_dir / "server-overlay/etc/lava-server"
+
+    logger.info("Copy: %s" %(os.path.join(conf_file_path, "env.yaml")))
+    shutil.copy(str(templates)+"/env.yaml", conf_file_path)
+
+
     logger.info("Create: %s" %(os.path.join(conf_file_path, "instance.conf")))
 
     # Resolve instance.jinja2 template with variables
@@ -405,7 +421,7 @@ def process_lava_server_provision_script(workers, master):
     j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader([str(templates)], followlinks=True), undefined=jinja2.StrictUndefined)
     conf = j2_env.get_template('provision.jinja2')
     conf = conf.render(context)
-    conf_file_path = str(base_dir)+"/output/%s/server-overlay/root" %(master_host)
+    conf_file_path = str(base_dir)+"/output/%s/server-overlay/root/entrypoint.d" %(master_host)
     provision_device_file = os.path.join(conf_file_path, "provision.sh")
     logger.info("Create device provision script: %s" %(provision_device_file))
     with open(provision_device_file, 'w') as f:
